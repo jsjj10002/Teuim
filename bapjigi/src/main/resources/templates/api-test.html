@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>밥지기 API 테스트</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container mt-5">
+        <header class="text-center mb-5">
+            <h1>밥지기 API 테스트</h1>
+            <p class="lead">백엔드 API를 테스트해보세요.</p>
+            <a href="/" class="btn btn-outline-secondary">홈으로 돌아가기</a>
+        </header>
+
+        <div class="row mb-4">
+            <div class="col-md-10 offset-md-1">
+                <div class="alert alert-info">
+                    <h5>API 테스트 방법</h5>
+                    <p>아래의 각 섹션에서 필요한 값을 입력하고 "테스트" 버튼을 누르면 결과가 화면에 표시됩니다.</p>
+                    <p>로그인 후 받은 토큰을 복사하여 다른 API 테스트에 사용하세요.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 목차 -->
+        <div class="row mb-4">
+            <div class="col-md-10 offset-md-1">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">API 목차</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <a href="#auth-api" class="btn btn-primary btn-sm w-100 mb-2">인증 API</a>
+                                <a href="#budget-api" class="btn btn-success btn-sm w-100 mb-2">예산 목표 API</a>
+                                <a href="#expense-api" class="btn btn-warning btn-sm w-100 mb-2">식비 지출 API</a>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="#meal-plan-api" class="btn btn-info btn-sm w-100 mb-2">식단표 API</a>
+                                <a href="#community-api" class="btn btn-secondary btn-sm w-100 mb-2">커뮤니티 API</a>
+                                <a href="#ranking-api" class="btn btn-danger btn-sm w-100 mb-2">랭킹 API</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 토큰 저장 영역 -->
+        <div class="row mb-4">
+            <div class="col-md-10 offset-md-1">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">인증 토큰</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="authToken" class="form-label">JWT 토큰 (로그인 후 자동으로 설정됩니다)</label>
+                            <input type="text" class="form-control" id="authToken">
+                            <div class="form-text">이 토큰은 로그인 API 호출 후 자동으로 설정되며, 다른 API 호출에 사용됩니다.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 인증 API 테스트 -->
+        <div id="auth-api" class="row mb-4">
+            <div class="col-md-10 offset-md-1">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">인증 API</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- 회원가입 -->
+                        <div class="api-section mb-4">
+                            <h5>회원가입</h5>
+                            <div class="mb-3">
+                                <label for="registerName" class="form-label">이름</label>
+                                <input type="text" class="form-control" id="registerName">
+                            </div>
+                            <div class="mb-3">
+                                <label for="registerUsername" class="form-label">사용자 이름</label>
+                                <input type="text" class="form-control" id="registerUsername">
+                            </div>
+                            <div class="mb-3">
+                                <label for="registerEmail" class="form-label">이메일</label>
+                                <input type="email" class="form-control" id="registerEmail">
+                            </div>
+                            <div class="mb-3">
+                                <label for="registerPassword" class="form-label">비밀번호</label>
+                                <input type="password" class="form-control" id="registerPassword">
+                            </div>
+                            <button id="registerBtn" class="btn btn-primary">회원가입 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="registerResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 로그인 -->
+                        <div class="api-section mb-4">
+                            <h5>로그인</h5>
+                            <div class="mb-3">
+                                <label for="loginUsername" class="form-label">사용자 이름</label>
+                                <input type="text" class="form-control" id="loginUsername">
+                            </div>
+                            <div class="mb-3">
+                                <label for="loginPassword" class="form-label">비밀번호</label>
+                                <input type="password" class="form-control" id="loginPassword">
+                            </div>
+                            <button id="loginBtn" class="btn btn-primary">로그인 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="loginResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 비밀번호 변경 -->
+                        <div class="api-section mb-4">
+                            <h5>비밀번호 변경</h5>
+                            <div class="mb-3">
+                                <label for="oldPassword" class="form-label">현재 비밀번호</label>
+                                <input type="password" class="form-control" id="oldPassword">
+                            </div>
+                            <div class="mb-3">
+                                <label for="newPassword" class="form-label">새 비밀번호</label>
+                                <input type="password" class="form-control" id="newPassword">
+                            </div>
+                            <button id="changePasswordBtn" class="btn btn-primary">비밀번호 변경 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="changePasswordResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 프로필 업데이트 -->
+                        <div class="api-section mb-4">
+                            <h5>프로필 업데이트</h5>
+                            <div class="mb-3">
+                                <label for="profileName" class="form-label">프로필 이름</label>
+                                <input type="text" class="form-control" id="profileName">
+                            </div>
+                            <div class="mb-3">
+                                <label for="profileImage" class="form-label">프로필 이미지 URL</label>
+                                <input type="text" class="form-control" id="profileImage">
+                            </div>
+                            <button id="updateProfileBtn" class="btn btn-primary">프로필 업데이트 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="updateProfileResult"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 예산 목표 API 테스트 -->
+        <div id="budget-api" class="row mb-4">
+            <div class="col-md-10 offset-md-1">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">예산 목표 API</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- 예산 목표 생성 -->
+                        <div class="api-section mb-4">
+                            <h5>예산 목표 생성</h5>
+                            <div class="mb-3">
+                                <label for="budgetAmount" class="form-label">금액</label>
+                                <input type="number" class="form-control" id="budgetAmount">
+                            </div>
+                            <div class="mb-3">
+                                <label for="budgetStartDate" class="form-label">시작일</label>
+                                <input type="date" class="form-control" id="budgetStartDate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="budgetEndDate" class="form-label">종료일</label>
+                                <input type="date" class="form-control" id="budgetEndDate">
+                            </div>
+                            <button id="createBudgetBtn" class="btn btn-success">예산 목표 생성 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="createBudgetResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 예산 목표 조회 -->
+                        <div class="api-section mb-4">
+                            <h5>예산 목표 조회</h5>
+                            <button id="getBudgetsBtn" class="btn btn-success">모든 예산 목표 조회 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="getBudgetsResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 현재 예산 목표 조회 -->
+                        <div class="api-section mb-4">
+                            <h5>현재 예산 목표 조회</h5>
+                            <button id="getCurrentBudgetBtn" class="btn btn-success">현재 예산 목표 조회 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="getCurrentBudgetResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 특정 예산 목표 조회 -->
+                        <div class="api-section mb-4">
+                            <h5>특정 예산 목표 조회</h5>
+                            <div class="mb-3">
+                                <label for="budgetIdToGet" class="form-label">예산 목표 ID</label>
+                                <input type="number" class="form-control" id="budgetIdToGet">
+                            </div>
+                            <button id="getBudgetByIdBtn" class="btn btn-success">특정 예산 목표 조회 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="getBudgetByIdResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 예산 목표 수정 -->
+                        <div class="api-section mb-4">
+                            <h5>예산 목표 수정</h5>
+                            <div class="mb-3">
+                                <label for="budgetIdToUpdate" class="form-label">예산 목표 ID</label>
+                                <input type="number" class="form-control" id="budgetIdToUpdate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="updateBudgetAmount" class="form-label">금액</label>
+                                <input type="number" class="form-control" id="updateBudgetAmount">
+                            </div>
+                            <div class="mb-3">
+                                <label for="updateBudgetStartDate" class="form-label">시작일</label>
+                                <input type="date" class="form-control" id="updateBudgetStartDate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="updateBudgetEndDate" class="form-label">종료일</label>
+                                <input type="date" class="form-control" id="updateBudgetEndDate">
+                            </div>
+                            <button id="updateBudgetBtn" class="btn btn-success">예산 목표 수정 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="updateBudgetResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 예산 목표 삭제 -->
+                        <div class="api-section mb-4">
+                            <h5>예산 목표 삭제</h5>
+                            <div class="mb-3">
+                                <label for="budgetIdToDelete" class="form-label">예산 목표 ID</label>
+                                <input type="number" class="form-control" id="budgetIdToDelete">
+                            </div>
+                            <button id="deleteBudgetBtn" class="btn btn-danger">예산 목표 삭제 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="deleteBudgetResult"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 식비 지출 API 테스트 -->
+        <div id="expense-api" class="row mb-4">
+            <div class="col-md-10 offset-md-1">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">식비 지출 API</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- 식비 지출 등록 -->
+                        <div class="api-section mb-4">
+                            <h5>식비 지출 등록</h5>
+                            <div class="mb-3">
+                                <label for="expenseAmount" class="form-label">금액</label>
+                                <input type="number" class="form-control" id="expenseAmount">
+                            </div>
+                            <div class="mb-3">
+                                <label for="expenseDate" class="form-label">날짜</label>
+                                <input type="date" class="form-control" id="expenseDate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="expenseDescription" class="form-label">설명</label>
+                                <input type="text" class="form-control" id="expenseDescription">
+                            </div>
+                            <button id="createExpenseBtn" class="btn btn-warning">식비 지출 등록 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="createExpenseResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 식비 지출 조회 -->
+                        <div class="api-section mb-4">
+                            <h5>식비 지출 조회</h5>
+                            <button id="getExpensesBtn" class="btn btn-warning">모든 식비 지출 조회 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="getExpensesResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 날짜 범위별 식비 지출 조회 -->
+                        <div class="api-section mb-4">
+                            <h5>날짜 범위별 식비 지출 조회</h5>
+                            <div class="mb-3">
+                                <label for="expenseStartDate" class="form-label">시작일</label>
+                                <input type="date" class="form-control" id="expenseStartDate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="expenseEndDate" class="form-label">종료일</label>
+                                <input type="date" class="form-control" id="expenseEndDate">
+                            </div>
+                            <button id="getExpensesByDateRangeBtn" class="btn btn-warning">날짜 범위별 조회 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="getExpensesByDateRangeResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 총 식비 지출 조회 -->
+                        <div class="api-section mb-4">
+                            <h5>총 식비 지출 조회</h5>
+                            <div class="mb-3">
+                                <label for="totalExpenseStartDate" class="form-label">시작일</label>
+                                <input type="date" class="form-control" id="totalExpenseStartDate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="totalExpenseEndDate" class="form-label">종료일</label>
+                                <input type="date" class="form-control" id="totalExpenseEndDate">
+                            </div>
+                            <button id="getTotalExpenseBtn" class="btn btn-warning">총 식비 지출 조회 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="getTotalExpenseResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 특정 식비 지출 조회 -->
+                        <div class="api-section mb-4">
+                            <h5>특정 식비 지출 조회</h5>
+                            <div class="mb-3">
+                                <label for="expenseIdToGet" class="form-label">식비 지출 ID</label>
+                                <input type="number" class="form-control" id="expenseIdToGet">
+                            </div>
+                            <button id="getExpenseByIdBtn" class="btn btn-warning">특정 식비 지출 조회 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="getExpenseByIdResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 식비 지출 수정 -->
+                        <div class="api-section mb-4">
+                            <h5>식비 지출 수정</h5>
+                            <div class="mb-3">
+                                <label for="expenseIdToUpdate" class="form-label">식비 지출 ID</label>
+                                <input type="number" class="form-control" id="expenseIdToUpdate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="updateExpenseAmount" class="form-label">금액</label>
+                                <input type="number" class="form-control" id="updateExpenseAmount">
+                            </div>
+                            <div class="mb-3">
+                                <label for="updateExpenseDate" class="form-label">날짜</label>
+                                <input type="date" class="form-control" id="updateExpenseDate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="updateExpenseDescription" class="form-label">설명</label>
+                                <input type="text" class="form-control" id="updateExpenseDescription">
+                            </div>
+                            <button id="updateExpenseBtn" class="btn btn-warning">식비 지출 수정 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="updateExpenseResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 식비 지출 삭제 -->
+                        <div class="api-section mb-4">
+                            <h5>식비 지출 삭제</h5>
+                            <div class="mb-3">
+                                <label for="expenseIdToDelete" class="form-label">식비 지출 ID</label>
+                                <input type="number" class="form-control" id="expenseIdToDelete">
+                            </div>
+                            <button id="deleteExpenseBtn" class="btn btn-danger">식비 지출 삭제 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="deleteExpenseResult"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 식단표 API 테스트 -->
+        <div id="meal-plan-api" class="row mb-4">
+            <div class="col-md-10 offset-md-1">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">식단표 API</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- AI 식단표 생성 -->
+                        <div class="api-section mb-4">
+                            <h5>AI 식단표 생성 (예산 목표 기간 전체)</h5>
+                            <div class="mb-3">
+                                <label for="budgetGoalId" class="form-label">예산 목표 ID</label>
+                                <input type="number" class="form-control" id="budgetGoalId" placeholder="모든 예산 목표 조회 후 ID를 확인하세요">
+                            </div>
+                            <div class="mb-3">
+                                <label for="mealsPerDay" class="form-label">하루 식사 수</label>
+                                <select class="form-select" id="mealsPerDay">
+                                    <option value="1">1끼</option>
+                                    <option value="2">2끼</option>
+                                    <option value="3" selected>3끼</option>
+                                </select>
+                            </div>
+                            <button id="generateMealPlanBtn" class="btn btn-info">식단표 생성 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="generateMealPlanResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 식단표 조회 -->
+                        <div class="api-section mb-4">
+                            <h5>특정 날짜 식단표 조회</h5>
+                            <div class="mb-3">
+                                <label for="mealPlanDate" class="form-label">날짜</label>
+                                <input type="date" class="form-control" id="mealPlanDate">
+                            </div>
+                            <button id="getMealPlanBtn" class="btn btn-info">특정 날짜 식단표 조회 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="getMealPlanResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+                        
+                        <!-- 모든 식단표 조회 -->
+                        <div class="api-section mb-4">
+                            <h5>모든 식단표 조회</h5>
+                            <button id="getAllMealPlansBtn" class="btn btn-info">모든 식단표 조회 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="getAllMealPlansResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 날짜 범위별 식단표 조회 -->
+                        <div class="api-section mb-4">
+                            <h5>날짜 범위별 식단표 조회</h5>
+                            <div class="mb-3">
+                                <label for="mealPlanStartDate" class="form-label">시작일</label>
+                                <input type="date" class="form-control" id="mealPlanStartDate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="mealPlanEndDate" class="form-label">종료일</label>
+                                <input type="date" class="form-control" id="mealPlanEndDate">
+                            </div>
+                            <button id="getMealPlansByDateRangeBtn" class="btn btn-info">날짜 범위별 식단표 조회 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="getMealPlansByDateRangeResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 식단표 수정 -->
+                        <div class="api-section mb-4">
+                            <h5>식단표 수정</h5>
+                            <div class="mb-3">
+                                <label for="updateMealPlanDate" class="form-label">수정할 식단표 날짜</label>
+                                <input type="date" class="form-control" id="updateMealPlanDate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="updateMealPlanBreakfast" class="form-label">아침</label>
+                                <input type="text" class="form-control" id="updateMealPlanBreakfast">
+                            </div>
+                            <div class="mb-3">
+                                <label for="updateMealPlanLunch" class="form-label">점심</label>
+                                <input type="text" class="form-control" id="updateMealPlanLunch">
+                            </div>
+                            <div class="mb-3">
+                                <label for="updateMealPlanDinner" class="form-label">저녁</label>
+                                <input type="text" class="form-control" id="updateMealPlanDinner">
+                            </div>
+                            <div class="mb-3">
+                                <label for="updateMealPlanCost" class="form-label">예상 비용</label>
+                                <input type="number" class="form-control" id="updateMealPlanCost">
+                            </div>
+                            <button id="updateMealPlanBtn" class="btn btn-info">식단표 수정 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="updateMealPlanResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 식단표 삭제 -->
+                        <div class="api-section mb-4">
+                            <h5>식단표 삭제</h5>
+                            <div class="mb-3">
+                                <label for="deleteMealPlanDate" class="form-label">삭제할 식단표 날짜</label>
+                                <input type="date" class="form-control" id="deleteMealPlanDate">
+                            </div>
+                            <button id="deleteMealPlanBtn" class="btn btn-danger">식단표 삭제 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="deleteMealPlanResult"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 커뮤니티 API 테스트 -->
+        <div id="community-api" class="row mb-4">
+            <div class="col-md-10 offset-md-1">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">커뮤니티 API</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- 게시물 작성 -->
+                        <div class="api-section mb-4">
+                            <h5>게시물 작성</h5>
+                            <div class="mb-3">
+                                <label for="postTitle" class="form-label">제목</label>
+                                <input type="text" class="form-control" id="postTitle">
+                            </div>
+                            <div class="mb-3">
+                                <label for="postContent" class="form-label">내용</label>
+                                <textarea class="form-control" id="postContent" rows="3"></textarea>
+                            </div>
+                            <button id="createPostBtn" class="btn btn-secondary">게시물 작성 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="createPostResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 모든 게시물 조회 -->
+                        <div class="api-section mb-4">
+                            <h5>모든 게시물 조회</h5>
+                            <div class="mb-3">
+                                <label for="postPage" class="form-label">페이지 번호</label>
+                                <input type="number" class="form-control" id="postPage" value="0">
+                            </div>
+                            <div class="mb-3">
+                                <label for="postSize" class="form-label">페이지 크기</label>
+                                <input type="number" class="form-control" id="postSize" value="10">
+                            </div>
+                            <button id="getAllPostsBtn" class="btn btn-secondary">모든 게시물 조회 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="getAllPostsResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 내 게시물 조회 -->
+                        <div class="api-section mb-4">
+                            <h5>내 게시물 조회</h5>
+                            <button id="getMyPostsBtn" class="btn btn-secondary">내 게시물 조회 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="getMyPostsResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 게시물 검색 -->
+                        <div class="api-section mb-4">
+                            <h5>게시물 검색</h5>
+                            <div class="mb-3">
+                                <label for="postKeyword" class="form-label">검색어</label>
+                                <input type="text" class="form-control" id="postKeyword">
+                            </div>
+                            <div class="mb-3">
+                                <label for="searchPostPage" class="form-label">페이지 번호</label>
+                                <input type="number" class="form-control" id="searchPostPage" value="0">
+                            </div>
+                            <div class="mb-3">
+                                <label for="searchPostSize" class="form-label">페이지 크기</label>
+                                <input type="number" class="form-control" id="searchPostSize" value="10">
+                            </div>
+                            <button id="searchPostsBtn" class="btn btn-secondary">게시물 검색 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="searchPostsResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 특정 게시물 조회 -->
+                        <div class="api-section mb-4">
+                            <h5>특정 게시물 조회</h5>
+                            <div class="mb-3">
+                                <label for="postIdToGet" class="form-label">게시물 ID</label>
+                                <input type="number" class="form-control" id="postIdToGet">
+                            </div>
+                            <button id="getPostByIdBtn" class="btn btn-secondary">특정 게시물 조회 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="getPostByIdResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 게시물 수정 -->
+                        <div class="api-section mb-4">
+                            <h5>게시물 수정</h5>
+                            <div class="mb-3">
+                                <label for="postIdToUpdate" class="form-label">게시물 ID</label>
+                                <input type="number" class="form-control" id="postIdToUpdate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="updatePostTitle" class="form-label">제목</label>
+                                <input type="text" class="form-control" id="updatePostTitle">
+                            </div>
+                            <div class="mb-3">
+                                <label for="updatePostContent" class="form-label">내용</label>
+                                <textarea class="form-control" id="updatePostContent" rows="3"></textarea>
+                            </div>
+                            <button id="updatePostBtn" class="btn btn-secondary">게시물 수정 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="updatePostResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 게시물 삭제 -->
+                        <div class="api-section mb-4">
+                            <h5>게시물 삭제</h5>
+                            <div class="mb-3">
+                                <label for="postIdToDelete" class="form-label">게시물 ID</label>
+                                <input type="number" class="form-control" id="postIdToDelete">
+                            </div>
+                            <button id="deletePostBtn" class="btn btn-danger">게시물 삭제 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="deletePostResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 게시물 좋아요 -->
+                        <div class="api-section mb-4">
+                            <h5>게시물 좋아요</h5>
+                            <div class="mb-3">
+                                <label for="postIdToLike" class="form-label">게시물 ID</label>
+                                <input type="number" class="form-control" id="postIdToLike">
+                            </div>
+                            <button id="likePostBtn" class="btn btn-secondary">게시물 좋아요 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="likePostResult"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 랭킹 API 테스트 -->
+        <div id="ranking-api" class="row mb-4">
+            <div class="col-md-10 offset-md-1">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">랭킹 API</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- 식비 랭킹 조회 -->
+                        <div class="api-section mb-4">
+                            <h5>식비 랭킹 조회</h5>
+                            <button id="getFoodExpenseRankingBtn" class="btn btn-danger">식비 랭킹 조회 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="getFoodExpenseRankingResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 특정 기간 식비 랭킹 조회 -->
+                        <div class="api-section mb-4">
+                            <h5>특정 기간 식비 랭킹 조회</h5>
+                            <div class="mb-3">
+                                <label for="rankingStartDate" class="form-label">시작일</label>
+                                <input type="date" class="form-control" id="rankingStartDate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="rankingEndDate" class="form-label">종료일</label>
+                                <input type="date" class="form-control" id="rankingEndDate">
+                            </div>
+                            <button id="getFoodExpenseRankingByPeriodBtn" class="btn btn-danger">특정 기간 식비 랭킹 조회 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="getFoodExpenseRankingByPeriodResult"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 나의 랭킹 정보 조회 -->
+                        <div class="api-section mb-4">
+                            <h5>나의 랭킹 정보 조회</h5>
+                            <button id="getMyRankingInfoBtn" class="btn btn-danger">나의 랭킹 정보 조회 테스트</button>
+                            <div class="mt-3">
+                                <div class="result-box p-3 border rounded" id="getMyRankingInfoResult"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/api-test.js}"></script>
+</body>
+</html> 

@@ -1,15 +1,25 @@
 package com.terabyte.bapjigi.controller;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.terabyte.bapjigi.dto.MealPlanDto;
 import com.terabyte.bapjigi.model.MealPlan;
 import com.terabyte.bapjigi.service.MealPlanService;
-import jakarta.validation.Valid;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.util.List;
+import jakarta.validation.Valid;
 
 /**
  * 식단표 관련 API를 처리하는 컨트롤러
@@ -42,15 +52,18 @@ public class MealPlanController {
 
     /**
      * AI를 이용한 식단표 자동 생성
-     * @param date 식단표 날짜
-     * @return 생성 성공 메시지
+     * 예산 목표 기간 동안의 모든 식단을 한 번에 생성
+     * @param budgetGoalId 예산 목표 ID
+     * @param mealsPerDay 하루에 먹을 식사 수 (기본값: 3)
+     * @return 생성된 식단 목록
      */
     @PostMapping("/generate")
     public ResponseEntity<?> generateAIMealPlan(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @RequestParam Long budgetGoalId,
+            @RequestParam(defaultValue = "3") int mealsPerDay) {
         try {
-            MealPlan mealPlan = mealPlanService.generateAIMealPlan(date);
-            return ResponseEntity.ok("AI가 식단표를 생성했습니다.");
+            Map<String, Object> mealPlans = mealPlanService.generateAIMealPlansForBudgetGoal(budgetGoalId, mealsPerDay);
+            return ResponseEntity.ok(mealPlans);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

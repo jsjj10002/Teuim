@@ -95,6 +95,7 @@ public class SecurityConfig {
             // URL별 접근 권한 설정
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/").permitAll() // 루트 경로 접근 허용
+                .requestMatchers("/api-test").permitAll() // API 테스트 페이지 접근 허용
                 .requestMatchers("/error").permitAll() // 에러 페이지 접근 허용
                 .requestMatchers("/static/**", "/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico").permitAll() // 정적 리소스 접근 허용
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Swagger 문서 접근 허용

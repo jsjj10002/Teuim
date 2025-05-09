@@ -53,7 +53,8 @@ public class JwtTokenProvider {
      */
     @PostConstruct
     public void init() {
-        this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        // HS512 알고리즘을 위한 안전한 키 생성 (512비트 이상)
+        this.key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
     }
 
     /**
