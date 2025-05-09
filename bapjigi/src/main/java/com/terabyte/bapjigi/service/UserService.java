@@ -1,11 +1,9 @@
 package com.terabyte.bapjigi.service;
 
-import com.terabyte.bapjigi.dto.LoginRequestDto;
-import com.terabyte.bapjigi.dto.LoginResponseDto;
-import com.terabyte.bapjigi.dto.UserRegisterDto;
-import com.terabyte.bapjigi.model.User;
-import com.terabyte.bapjigi.repository.UserRepository;
-import com.terabyte.bapjigi.security.JwtTokenProvider;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,8 +15,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.UUID;
+import com.terabyte.bapjigi.dto.LoginRequestDto;
+import com.terabyte.bapjigi.dto.LoginResponseDto;
+import com.terabyte.bapjigi.dto.UserRegisterDto;
+import com.terabyte.bapjigi.model.User;
+import com.terabyte.bapjigi.repository.UserRepository;
+import com.terabyte.bapjigi.security.JwtTokenProvider;
 
 /**
  * 사용자 관련 비즈니스 로직을 처리하는 서비스
@@ -29,14 +31,22 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final AuthenticationManager authenticationManager;
+    private JwtTokenProvider jwtTokenProvider;
+    private AuthenticationManager authenticationManager;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                       JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager) {
+    @Autowired
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    @Autowired
+    public void setJwtTokenProvider(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
+    }
+
+    @Autowired
+    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
 

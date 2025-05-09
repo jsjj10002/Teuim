@@ -1,10 +1,11 @@
 package com.terabyte.bapjigi.security;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
+import java.security.Key;
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -12,8 +13,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
-import java.util.Date;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 
 /**
  * JWT 토큰 생성, 검증 및 사용자 인증 정보 추출을 담당하는 컴포넌트
@@ -34,9 +41,10 @@ public class JwtTokenProvider {
     // JWT 서명에 사용할 키
     private Key key;
 
-    private final UserDetailsService userDetailsService;
+    private UserDetailsService userDetailsService;
 
-    public JwtTokenProvider(UserDetailsService userDetailsService) {
+    @Autowired
+    public void setUserDetailsService(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 
