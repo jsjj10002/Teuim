@@ -9,6 +9,10 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 인증 관련 API를 처리하는 컨트롤러
+ * 회원가입, 로그인, 비밀번호 변경, 프로필 수정 등의 엔드포인트 제공
+ */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -19,6 +23,11 @@ public class AuthController {
         this.userService = userService;
     }
 
+    /**
+     * 회원 가입 처리
+     * @param userRegisterDto 회원 가입 정보
+     * @return 회원 가입 성공 메시지
+     */
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegisterDto userRegisterDto) {
         try {
@@ -29,6 +38,11 @@ public class AuthController {
         }
     }
 
+    /**
+     * 로그인 처리
+     * @param loginRequestDto 로그인 요청 정보
+     * @return JWT 토큰 및 사용자 정보
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
         try {
@@ -39,6 +53,12 @@ public class AuthController {
         }
     }
 
+    /**
+     * 비밀번호 변경
+     * @param oldPassword 현재 비밀번호
+     * @param newPassword 새 비밀번호
+     * @return 비밀번호 변경 성공 메시지
+     */
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestParam String oldPassword, 
                                            @RequestParam String newPassword) {
@@ -51,6 +71,12 @@ public class AuthController {
         }
     }
 
+    /**
+     * 프로필 정보 업데이트
+     * @param profileName 프로필 이름 (선택적)
+     * @param profileImage 프로필 이미지 (선택적)
+     * @return 프로필 업데이트 성공 메시지
+     */
     @PostMapping("/update-profile")
     public ResponseEntity<?> updateProfile(@RequestParam(required = false) String profileName,
                                            @RequestParam(required = false) String profileImage) {

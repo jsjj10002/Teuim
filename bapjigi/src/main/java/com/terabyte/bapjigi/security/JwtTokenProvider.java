@@ -15,17 +15,23 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 
+/**
+ * JWT 토큰 생성, 검증 및 사용자 인증 정보 추출을 담당하는 컴포넌트
+ */
 @Component
 public class JwtTokenProvider {
     
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
+    // application.properties에서 JWT 비밀키 가져오기
     @Value("${jwt.secret}")
     private String jwtSecret;
 
+    // application.properties에서 JWT 토큰 만료 시간 가져오기 (밀리초)
     @Value("${jwt.expiration}")
     private long jwtExpirationInMs;
 
+    // JWT 서명에 사용할 키
     private Key key;
 
     private final UserDetailsService userDetailsService;
@@ -34,11 +40,19 @@ public class JwtTokenProvider {
         this.userDetailsService = userDetailsService;
     }
 
+    /**
+     * 빈 초기화 시 JWT 서명 키 생성
+     */
     @PostConstruct
     public void init() {
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
+    /**
+     * 사용자명으로 JWT 토큰 생성
+     * @param username 사용자명
+     * @return 생성된 JWT 토큰
+     */
     public String generateToken(String username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
@@ -51,6 +65,11 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    /**
+     * JWT 토큰에서 사용자명 추출
+     * @param token JWT 토큰
+     * @return 사용자명
+     */
     public String getUsernameFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -61,6 +80,11 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
+    /**
+     * JWT 토큰 유효성 검증
+     * @param token JWT 토큰
+     * @return 유효 여부
+     */
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
@@ -77,6 +101,11 @@ public class JwtTokenProvider {
         return false;
     }
 
+    /**
+     * 토큰에서 인증 정보 추출
+     * @param token JWT 토큰
+     * @return 인증 객체
+     */
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(getUsernameFromToken(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());

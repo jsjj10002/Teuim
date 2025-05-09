@@ -20,6 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * 사용자 관련 비즈니스 로직을 처리하는 서비스
+ * 회원가입, 로그인, 프로필 관리 등의 기능 제공
+ */
 @Service
 public class UserService implements UserDetailsService {
 
@@ -36,12 +40,20 @@ public class UserService implements UserDetailsService {
         this.authenticationManager = authenticationManager;
     }
 
+    /**
+     * 사용자명으로 사용자 정보를 로드
+     * Spring Security에서 인증 과정에 사용
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
     }
 
+    /**
+     * 회원가입 처리
+     * 중복 아이디 확인 및 비밀번호 암호화 수행
+     */
     @Transactional
     public User registerUser(UserRegisterDto registerDto) {
         if (userRepository.existsByUsername(registerDto.getUsername())) {
@@ -70,6 +82,10 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
+    /**
+     * 고유한 프로필 이름 생성
+     * 이름_랜덤UUID 형식으로 생성하며 중복 확인
+     */
     private String generateUniqueProfileName(String name) {
         String baseName = name != null && !name.isEmpty() ? name : "user";
         String profileName = baseName + "_" + UUID.randomUUID().toString().substring(0, 8);
@@ -81,6 +97,10 @@ public class UserService implements UserDetailsService {
         return profileName;
     }
 
+    /**
+     * 로그인 처리
+     * 인증 후 JWT 토큰 발급
+     */
     @Transactional
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
         Authentication authentication = authenticationManager.authenticate(
@@ -105,6 +125,10 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
+    /**
+     * 비밀번호 변경
+     * 기존 비밀번호 확인 후 변경
+     */
     @Transactional
     public User changePassword(String username, String oldPassword, String newPassword) {
         User user = userRepository.findByUsername(username)
@@ -118,6 +142,10 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
+    /**
+     * 프로필 정보 업데이트
+     * 프로필 이름 중복 확인 수행
+     */
     @Transactional
     public User updateProfile(String username, String profileName, String profileImage) {
         User user = userRepository.findByUsername(username)
@@ -137,10 +165,16 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
+    /**
+     * 사용자명으로 사용자 조회
+     */
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
+    /**
+     * 현재 인증된 사용자 정보 반환
+     */
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
